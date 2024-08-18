@@ -4,11 +4,12 @@ import imgBudget1 from "../../assets/images/Budget.png";
 import imgBudget2 from "../../assets/images/Budget-2.png";
 import imgBudget3 from "../../assets/images/budget-3.png";
 import imgBudget4 from "../../assets/images/budget-4.png";
-import CreateBudget from "./CreateBudget";
+import CreateBudget from "./CreateBudgetBox";
+import BudgetHistory from "./BudgetHistory";
 
 const OfficeBudget = () => {
   return (
-    <section className="bg-backgroundColor">
+    <section className="bg-backgroundColor max-w-[1132px]">
       <div>
         <div className="flex items-center justify-center gap-5">
           {/*  */}
@@ -86,6 +87,7 @@ const OfficeBudget = () => {
         </div>
       </div>
       <CreateBudget />
+      <BudgetHistory />
     </section>
   );
 };

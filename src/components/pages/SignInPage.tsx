@@ -1,7 +1,7 @@
 import React, { useId } from "react";
-import { useDispatch } from "react-redux";
-import { fetchSignIn } from "../store/operations";
-import { AppDispatch } from "../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../store/operations";
+import { AppDispatch, RootStat } from "../store/store";
 import { Field, Form, Formik, ErrorMessage } from "formik";
 import imgLogo from "../../assets/images/logo-img.png";
 import imgDepos from "../../assets/images/auth-img.png";
@@ -9,7 +9,6 @@ import { ISignIn } from "../types/infoAuthTypes";
 import * as Yup from "yup";
 import CommonButton from "../common/Button";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 const SignInScheme = Yup.object().shape({
   email: Yup.string().email("Must be a valid email").required("Required"),
@@ -22,35 +21,31 @@ const SignInScheme = Yup.object().shape({
 const initialValues = { email: "", password: "" };
 
 const SignInPage: React.FC = () => {
-  const { isLoading, error } = useSelector((state) => state.user);
+  const { isLoading, error } = useSelector((state: RootStat) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const emailId = useId();
   const passwordId = useId();
   const rememberId = useId();
+
   const handleSubmit = async (values: ISignIn) => {
     try {
-      await dispatch(fetchSignIn(values));
+      await dispatch(login(values)).unwrap();
+      navigate("/", { replace: true });
     } catch (error) {
       console.error("Ошибка авторизации:", error);
     }
-    values.email = "";
-    values.password = "";
   };
   const handleOpenSignUpPage = () => {
     navigate("/signup", {
       replace: true,
     });
   };
-  const handleOpenDashboardPage = () => {
-    navigate("/", {
-      replace: true,
-    });
-  };
   return (
     <section className="flex items-center justify-center h-[100vh]">
-      {isLoading && <h1>...Loading</h1>}
-      {error && <h2>Error happened - {error}</h2>}
+      {isLoading && (
+        <h1 className="text-[50px] text-black] mr-[50px]">...Loading</h1>
+      )}
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -59,7 +54,7 @@ const SignInPage: React.FC = () => {
         <Form>
           <div className="flex justify-center items-center">
             <div className="mt-[50px] mr-[150px] mb-[84px] ml-[150px]">
-              <div className="flex items-center justify-between ">
+              <div className="flex items-center justify-between">
                 <img src={imgLogo} alt="LOGO" />
                 <button
                   onClick={handleOpenSignUpPage}
@@ -84,15 +79,14 @@ const SignInPage: React.FC = () => {
                     Email address
                   </label>
                   <Field
-                    className="rounded-[10px] border-solid border-[1px] w-[350px]   border-input-color p-[13px] text-gray-500"
+                    className="rounded-[10px] border-solid border-[1px] w-[350px] border-input-color p-[13px] text-gray-500"
                     type="email"
                     name="email"
                     placeholder="Enter email address"
                     id={emailId}
                   />
-
                   <ErrorMessage
-                    className="text-red-500 m-1 "
+                    className="text-red-500 m-1"
                     name="email"
                     component="p"
                   />
@@ -106,7 +100,7 @@ const SignInPage: React.FC = () => {
                     Password
                   </label>
                   <Field
-                    className="rounded-[10px] border-solid border-[1px] w-[350px]  border-input-color p-[13px] text-gray-500"
+                    className="rounded-[10px] border-solid border-[1px] w-[350px] border-input-color p-[13px] text-gray-500"
                     type="password"
                     name="password"
                     placeholder="Enter your password"
@@ -132,7 +126,6 @@ const SignInPage: React.FC = () => {
 
                 <CommonButton
                   type="submit"
-                  onClick={handleOpenDashboardPage}
                   className="rounded-[10px] p-2.5 w-[350px] mt-[38px] flex items-center justify-center"
                   label="Sign in"
                 />
@@ -143,6 +136,9 @@ const SignInPage: React.FC = () => {
           </div>
         </Form>
       </Formik>
+      {error && (
+        <h2 className="text-20px text-red-500">Error happened - {error}</h2>
+      )}
     </section>
   );
 };

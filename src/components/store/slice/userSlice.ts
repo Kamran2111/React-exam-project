@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchSignIn, fetchSignUp } from "../operations";
+import { login } from "../operations";
 import { IError } from "../../types/infoAuthTypes";
 
-interface AuthState {
+interface IAuthState {
   id: number | null;
   email: string | null;
   token: string | null;
@@ -10,7 +10,7 @@ interface AuthState {
   isLoading: boolean;
 }
 
-export const initialState: AuthState = {
+export const initialState: IAuthState = {
   id: null,
   email: null,
   token: null,
@@ -21,35 +21,34 @@ export const initialState: AuthState = {
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.id = null;
+      state.email = null;
+      state.token = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchSignIn.pending, (state) => {
+      .addCase(login.pending, (state) => {
         state.isLoading = true;
-      })
-      .addCase(fetchSignIn.fulfilled, (state, action) => {
-        state.id = action.payload.id;
-        state.email = action.payload.email;
-        state.token = action.payload.access_token;
-        state.isLoading = false;
         state.error = null;
       })
-      .addCase(fetchSignIn.rejected, (state, action) => {
+      .addCase(login.fulfilled, (state, { payload }) => {
         state.isLoading = false;
-        state.error = action.payload as IError;
+        state.token = payload.access_token;
+        if (payload.user) {
+          state.id = payload.user.id || null;
+          state.email = payload.user.email || null;
+        } else {
+          state.id = null;
+          state.email = null;
+        }
+        state.error = null;
       })
-      .addCase(fetchSignUp.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchSignUp.fulfilled, (state, action) => {
-        state.id = action.payload.id;
-        state.email = action.payload.email;
-        state.token = action.payload.access_token;
-        (state.isLoading = false), (state.error = null);
-      })
-      .addCase(fetchSignUp.rejected, (state, action) => {
+      .addCase(login.rejected, (state, { payload }) => {
         state.isLoading = false;
-        state.error = action.payload as IError;
+        state.error = payload as IError;
       });
   },
 });

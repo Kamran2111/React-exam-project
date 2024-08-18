@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       colors: {
         backgroundColor: "#F8F9FD",
+        textColor: "rgb(81,81,81)",
       },
       backgroundImage: {
         "custom-btn-gradient":
